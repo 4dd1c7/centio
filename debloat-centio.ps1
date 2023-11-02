@@ -8,8 +8,6 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 	Exit
 }
 
-
-
 ##########
 # Privacy Settings
 ##########
@@ -17,7 +15,6 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 # Disable Telemetry
 Write-Host "Disabling Telemetry..."
 Set-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
-
 
 # Disable Wi-Fi Sense
 Write-Host "Disabling Wi-Fi Sense..."
@@ -32,7 +29,6 @@ Write-Host "Disabling SmartScreen Filter..."
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer" -Name "SmartScreenEnabled" -Type String -Value "Off"
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\AppHost" -Name "EnableWebContentEvaluation" -Type DWord -Value 0
 
-
 # Disable Bing Search in Start Menu
 Write-Host "Disabling Bing Search in Start Menu..."
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Type DWord -Value 0
@@ -41,7 +37,6 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" 
 Write-Host "Disabling Location Tracking..."
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type DWord -Value 0
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Services\lfsvc\Service\Configuration" -Name "Status" -Type DWord -Value 0
-
 
 # Disable Feedback
 Write-Host "Disabling Feedback..."
@@ -73,14 +68,6 @@ If (!(Test-Path "HKCU:\Software\Microsoft\InputPersonalization\TrainedDataStore"
 }
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Type DWord -Value 0
 
-# Remove AutoLogger file and restrict directory
-Write-Host "Removing AutoLogger file and restricting directory..."
-$autoLoggerDir = "$env:PROGRAMDATA\Microsoft\Diagnosis\ETLLogs\AutoLogger"
-If (Test-Path "$autoLoggerDir\AutoLogger-Diagtrack-Listener.etl") {
-	Remove-Item "$autoLoggerDir\AutoLogger-Diagtrack-Listener.etl"
-}
-icacls $autoLoggerDir /deny SYSTEM:`(OI`)`(CI`)F | Out-Null
-
 # Stop and disable Diagnostics Tracking Service
 Write-Host "Stopping and disabling Diagnostics Tracking Service..."
 Stop-Service "DiagTrack"
@@ -90,18 +77,9 @@ Set-Service "DiagTrack" -StartupType Disabled
 # Service Tweaks
 ##########
 
-
 # Disable Windows Update automatic restart
 Write-Host "Disabling Windows Update automatic restart..."
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings" -Name "UxOption" -Type DWord -Value 1
-
-# Stop and disable Home Groups services
-Write-Host "Stopping and disabling Home Groups services..."
-Stop-Service "HomeGroupListener"
-Set-Service "HomeGroupListener" -StartupType Disabled
-Stop-Service "HomeGroupProvider"
-Set-Service "HomeGroupProvider" -StartupType Disabled
-
 
 Disable Autoplay
 Write-Host "Disabling Autoplay..."
@@ -130,7 +108,6 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer
 Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 
-
 ##########
 # Remove unwanted applications
 ##########
@@ -146,7 +123,6 @@ Get-AppxPackage "Microsoft.Getstarted" | Remove-AppxPackage
 Get-AppxPackage "Microsoft.MicrosoftOfficeHub" | Remove-AppxPackage
 Get-AppxPackage "Microsoft.MicrosoftSolitaireCollection" | Remove-AppxPackage
 Get-AppxPackage "Microsoft.Office.OneNote" | Remove-AppxPackage
-Get-AppxPackage "Microsoft.People" | Remove-AppxPackage
 Get-AppxPackage "Microsoft.SkypeApp" | Remove-AppxPackage
 Get-AppxPackage "microsoft.windowscommunicationsapps" | Remove-AppxPackage
 Get-AppxPackage "Microsoft.WindowsMaps" | Remove-AppxPackage
@@ -206,7 +182,6 @@ foreach ($service in $services) {
     Get-Service -Name $service | Set-Service -StartupType Disabled
 }
 
-
 # This script removes unwanted Apps that come with Windows. If you  do not want
 # to remove certain Apps comment out the corresponding lines below.
 
@@ -261,7 +236,6 @@ $apps = @(
     "Microsoft.Windows.CloudExperienceHost"
     "Microsoft.Windows.ContentDeliveryManager"
     "Microsoft.Windows.PeopleExperienceHost"
-    "Microsoft.XboxGameCallableUI"
     "Microsoft.GamingApp"
 
     # Threshold 2 apps
@@ -288,7 +262,6 @@ $apps = @(
     "Microsoft.MixedReality.Portal"
     #"Microsoft.ScreenSketch"
     "Microsoft.XboxGamingOverlay"
-    "Microsoft.YourPhone"
 
 )
 
@@ -317,10 +290,6 @@ $cdm = @(
     "SystemPaneSuggestionsEnabled"
 )
 
-New-FolderForced -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
-foreach ($key in $cdm) {
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" $key 0
-}
 
 New-FolderForced -Path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore" "AutoDownload" 2
